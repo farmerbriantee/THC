@@ -25,7 +25,7 @@ I2C_LCD lcd(39);
 // Setting the scale for the converting analogRead values to volts.
 // 4.450 AREF voltage * 50 built-in voltage divider / 1023 resolution = 0.21749755 ADC counts per volt
 // As far as I can tell, the arithmetic below *does* get optimized out by the compiler.
-#define SCALE (4.330*50/1023)
+#define SCALE (5.00*50/1023)
 
 
 
@@ -92,7 +92,7 @@ void setup()
 
     // Set the reference voltage to the external linear regulator
     // Do a few throwaway reads so the ADC stabilizes, as recommended by the docs.
-    //analogReference(EXTERNAL);
+    analogReference(EXTERNAL);
     analogRead(PLASMA); analogRead(PLASMA); analogRead(PLASMA); analogRead(PLASMA); analogRead(PLASMA);
 
     // We need to calculate how big the shift must be, for a given sample size.
@@ -104,13 +104,14 @@ void setup()
     // Setup the LCD's columns and rows 
     Wire.begin();
     lcd.begin(20, 4);
+    lcd.clear();
 
     //  display fixed text once
     lcd.setCursor(0, 0);
     lcd.print("Set Volts: ");
 
     lcd.setCursor(0, 1);
-    lcd.print("Plasma: ");
+    lcd.print("Plasma: Cal");
 
     // Now enter the period where you can set the voltage via the potentiomenter.
     // Default 5s period, plus an extension 2s as long as you keep adjusting it.
@@ -119,7 +120,7 @@ void setup()
     // capacitance of the ADC muxer.
     i = 0;
     ms = millis();
-    timelimit = ms + 5000;
+    timelimit = ms + 3000;
 
     while (ms < timelimit) {
         tmp = analogRead(ADJUST);
