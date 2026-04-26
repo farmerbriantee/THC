@@ -45,7 +45,7 @@ I2C_LCD lcd(39);
 #define ARC_GOOD_PIN 4
 #define THC_PIN 6
 
-#define BUFSIZE 512  // Would technically let us do running averages up to BUFSIZE samples. In testing, shorter averages seemed better.
+#define BUFSIZE 32  // Would technically let us do running averages up to BUFSIZE samples. In testing, shorter averages seemed better.
 #define SAMP 16  // Use this many samples in the average; must be a power of 2 and no larger than BUFSIZE.
 #define DISP 2048 // The number of samples to use in calculating a slower average for the display. Must also be a power of 2.
 
@@ -234,15 +234,17 @@ void loop()
     {
         lcd.setCursor(8, 1);
         lcd.print((float)((disp / DISP) * SCALE), 1);
+        
         lcd.setCursor(8, 2);
-        lcd.print("     ");
-        lcd.setCursor(8, 2);
-        lcd.print(diff);
+        char buffer[6];
+        snprintf(buffer, sizeof(buffer), "%5ld", diff);
+        lcd.print(buffer); 
+        
         lcd.setCursor(8, 3);
         if (mode == 0) lcd.print("Hold");
         else if (mode == 1) lcd.print(" Up ");
         else if (mode == 2) lcd.print("Down");
-        disp = 1;
+        disp = 0;
 
         if (!digitalRead(ARC_GOOD_PIN)) digitalWrite(THC_PIN, THC_ON);
         else digitalWrite(THC_PIN, THC_OFF);
