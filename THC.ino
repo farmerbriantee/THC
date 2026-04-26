@@ -27,7 +27,8 @@ I2C_LCD lcd(39);
 // As far as I can tell, the arithmetic below *does* get optimized out by the compiler.
 #define SCALE (5.00*50/1023)
 
-
+#define THC_ON 0
+#define THC_OFF 1
 
 // Adjustment range for the knob.
 #define MINSET 110
@@ -40,6 +41,13 @@ I2C_LCD lcd(39);
 //Stepper driver input
 #define DIR 5
 #define PULSE 4
+
+    //Stepper driver input
+#define DIR 10
+#define PULSE 8
+
+#define ARC_GOOD 4
+#define THC_PIN 6
 
 #define BUFSIZE 512  // Would technically let us do running averages up to BUFSIZE samples. In testing, shorter averages seemed better.
 #define SAMP 16  // Use this many samples in the average; must be a power of 2 and no larger than BUFSIZE.
@@ -89,6 +97,15 @@ void setup()
 
     pinMode(DIR, OUTPUT);
     pinMode(PULSE, OUTPUT);
+
+    //Switch the THC controlled Z axis
+    pinMode(THC_PIN, OUTPUT);
+
+    //Read if Arc Good to begin THC
+    pinMode(ARC_GOOD, INPUT);
+    pinMode(ARC_GOOD, INPUT_PULLUP);
+
+    digitalWrite(THC_PIN, THC_OFF);
 
     // Set the reference voltage to the external linear regulator
     // Do a few throwaway reads so the ADC stabilizes, as recommended by the docs.
@@ -230,6 +247,9 @@ void loop()
         else if (mode == 1) lcd.print(" Up ");
         else if (mode == 2) lcd.print("Down");
         disp = 1;
+
+        if (!digitalRead(ARC_GOOD)) digitalWrite(THC_PIN, THC_ON);
+        else digitalWrite(THC_PIN, THC_OFF);
     }
 
     // Faster than modular arithmetic, by far. Doing that drops us down to ~3kS/sec.
