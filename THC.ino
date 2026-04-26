@@ -27,8 +27,8 @@ I2C_LCD lcd(39);
 // As far as I can tell, the arithmetic below *does* get optimized out by the compiler.
 #define SCALE (5.00*50/1023)
 
-#define THC_ON 0
-#define THC_OFF 1
+#define THC_ON 1
+#define THC_OFF 0
 
 // Adjustment range for the knob.
 #define MINSET 110
@@ -38,15 +38,11 @@ I2C_LCD lcd(39);
 #define ADJUST A1
 #define PLASMA A0
 
-//Stepper driver input
-#define DIR 5
-#define PULSE 4
-
     //Stepper driver input
 #define DIR 10
 #define PULSE 8
 
-#define ARC_GOOD 4
+#define ARC_GOOD_PIN 4
 #define THC_PIN 6
 
 #define BUFSIZE 512  // Would technically let us do running averages up to BUFSIZE samples. In testing, shorter averages seemed better.
@@ -102,8 +98,8 @@ void setup()
     pinMode(THC_PIN, OUTPUT);
 
     //Read if Arc Good to begin THC
-    pinMode(ARC_GOOD, INPUT);
-    pinMode(ARC_GOOD, INPUT_PULLUP);
+    pinMode(ARC_GOOD_PIN, INPUT);
+    pinMode(ARC_GOOD_PIN, INPUT_PULLUP);
 
     digitalWrite(THC_PIN, THC_OFF);
 
@@ -137,7 +133,7 @@ void setup()
     // capacitance of the ADC muxer.
     i = 0;
     ms = millis();
-    timelimit = ms + 3000;
+    timelimit = ms + 5000;
 
     while (ms < timelimit) {
         tmp = analogRead(ADJUST);
@@ -248,7 +244,7 @@ void loop()
         else if (mode == 2) lcd.print("Down");
         disp = 1;
 
-        if (!digitalRead(ARC_GOOD)) digitalWrite(THC_PIN, THC_ON);
+        if (!digitalRead(ARC_GOOD_PIN)) digitalWrite(THC_PIN, THC_ON);
         else digitalWrite(THC_PIN, THC_OFF);
     }
 
