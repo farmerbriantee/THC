@@ -247,6 +247,9 @@ void loop()
         else if (mode == 1) lcd.print(" Up ");
         else if (mode == 2) lcd.print("Down");
         disp = 1;
+
+        if (!digitalRead(ARC_GOOD)) digitalWrite(THC_PIN, THC_ON);
+        else digitalWrite(THC_PIN, THC_OFF);
     }
 
     // Faster than modular arithmetic, by far. Doing that drops us down to ~3kS/sec.
